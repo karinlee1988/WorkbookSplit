@@ -11,3 +11,10 @@
 
 
 import openpyxl
+
+class WorkbookSplitByColumn(object):
+
+    def __init__(self,path,column_index,title_index):
+        self.path = path
+        self.column_index = column_index
+
