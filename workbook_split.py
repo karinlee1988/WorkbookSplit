@@ -33,7 +33,7 @@ class WorksheetSplitByColumn(object):
         # 获取表头行数
         self.title_index =title_index
 
-    def split(self, column_key: str):
+    def split_by_column(self, column_key: str):
         """
         拆分表格并分别另存为
 
@@ -55,10 +55,52 @@ class WorksheetSplitByColumn(object):
         wb.save(f'{column_key}.xlsx')
 
 
+    def get_column_key_list(self):
+        """
+        获取列关键字列表
+
+        :return: duplicate_removal_list: 去重后的列关键字列表
+        :rtype: duplicate_removal_list: str
+
+        """
+        column_key_list = []
+        wb = openpyxl.load_workbook(self.filepath)
+        ws = wb.active
+        for row in range (self.title_index+1,ws.max_row+1):
+            column_key_list.append(ws.cell(row=row,column=self.column_index).value)
+        #获取到的column_key_list有重复，需要去重
+        duplicate_removal_list = []
+        for column_key in column_key_list:
+            if column_key not in duplicate_removal_list:
+                duplicate_removal_list.append(column_key)
+
+        # 返回去重后的列关键字列表
+        return duplicate_removal_list
+
+    def main(self):
+        """
+        主程序入口
+        :return:
+        """
+        # 先拿到去重的列关键字
+        duplicate_removal_list = self.get_column_key_list()
+        # 然后不断循环拆分
+        count = 1
+        for column_key in duplicate_removal_list:
+            self.split_by_column(column_key=column_key)
+            print(f'{count}  ----  {column_key}已成功拆分！')
+            count += 1
+
+
+
+
+
+
 if __name__ == '__main__':
     workbook_path = '托收单附件明细待拆分打印.xlsx'
-    app = WorksheetSplitByColumn(workbook_path,0,3)
-    app.split('英德市白沙镇中心小学')
+    app = WorksheetSplitByColumn(workbook_path,5,3)
+    # app.split_by_column('英德市白沙镇中心小学')
+    app.main()
 
 
 
