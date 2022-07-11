@@ -9,7 +9,7 @@
 # @gitee : https://gitee.com/karinlee/
 # @Personal website : https://karinlee.cn/
 
-
+import os
 import openpyxl
 
 class WorksheetSplitByColumn(object):
@@ -17,7 +17,7 @@ class WorksheetSplitByColumn(object):
     用于按列的内容拆分excel工作薄中的一个工作表，分别另存为多个独立的工作薄/打印
     """
 
-    def __init__(self,filepath,column_index:int,title_index:int):
+    def __init__(self,filepath,column_index:int,title_index:int,isprint:bool=False):
 
         """
 
@@ -32,6 +32,8 @@ class WorksheetSplitByColumn(object):
         self.column_index = column_index
         # 获取表头行数
         self.title_index =title_index
+        # 是否选择拆分后自动打印，默认为false(否)
+        self.isprint = isprint
 
     def split_by_column(self, column_key: str):
         """
@@ -41,7 +43,7 @@ class WorksheetSplitByColumn(object):
         这样，待拆分表格先行用excel打开设置好格式，删除就不会错乱
         但删除操作耗时较大。
 
-        :param column_key:  关键字用于按列拆分
+        :param column_key:  列关键字,用于按列拆分
         :return:
         """
         # 读取待拆分的源数据表（为了不改变原有格式，每次都读取一次比较稳妥。拆分等于就是在原表上将不要的行删除掉，格式还是原表的格式）
@@ -52,8 +54,10 @@ class WorksheetSplitByColumn(object):
         for row in range(ws.max_row + 1, self.title_index, -1):
             if ws.cell(row=row, column=self.column_index).value != column_key:
                 ws.delete_rows(row)
+        # 拆分后的表格另存为独立的xlsx文件，设置文件名为列关键字
         wb.save(f'{column_key}.xlsx')
-
+        if self.isprint is True:
+            os.startfile(f'{column_key}.xlsx','print')
 
     def get_column_key_list(self):
         """
@@ -85,6 +89,7 @@ class WorksheetSplitByColumn(object):
         # 先拿到去重的列关键字
         duplicate_removal_list = self.get_column_key_list()
         # 然后不断循环拆分
+        # count变量用于计数
         count = 1
         for column_key in duplicate_removal_list:
             self.split_by_column(column_key=column_key)
@@ -93,7 +98,7 @@ class WorksheetSplitByColumn(object):
 
 if __name__ == '__main__':
     workbook_path = '拆分测试表.xlsx'
-    app = WorksheetSplitByColumn(filepath=workbook_path,column_index=4,title_index=4)
+    app = WorksheetSplitByColumn(filepath=workbook_path,column_index=4,title_index=4,isprint=False)
     # app.split_by_column('英德市白沙镇中心小学')
     app.main()
 
