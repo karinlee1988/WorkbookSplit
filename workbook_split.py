@@ -50,7 +50,7 @@ class WorksheetSplitByColumn(object):
         # 根据传入的列关键字，若列中与传入的关键字不同，则删除。循环完毕后，剩下就等效于拆分后的数据了
         # 删除操作会改变行对应的行号，所以从最大行开始遍历，倒过来循环。
         for row in range(ws.max_row + 1, self.title_index, -1):
-            if ws.cell(row=row, column=5).value != column_key:
+            if ws.cell(row=row, column=self.column_index).value != column_key:
                 ws.delete_rows(row)
         wb.save(f'{column_key}.xlsx')
 
@@ -91,14 +91,9 @@ class WorksheetSplitByColumn(object):
             print(f'{count}  ----  {column_key}已成功拆分！')
             count += 1
 
-
-
-
-
-
 if __name__ == '__main__':
-    workbook_path = '托收单附件明细待拆分打印.xlsx'
-    app = WorksheetSplitByColumn(workbook_path,5,3)
+    workbook_path = '拆分测试表.xlsx'
+    app = WorksheetSplitByColumn(filepath=workbook_path,column_index=4,title_index=4)
     # app.split_by_column('英德市白沙镇中心小学')
     app.main()
 
